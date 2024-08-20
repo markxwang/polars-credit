@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "polarscore"
+version = "0.1.0"
+description = "Lightning-fast credit scorecard building with Polars"
+authors = ["mark.wang <wxgter@gmail.com>"]
+license = "BSD-3"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+polars = "^1.5.0"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.2"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.5"
+ruff = "^0.6.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

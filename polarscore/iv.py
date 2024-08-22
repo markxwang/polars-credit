@@ -6,7 +6,6 @@ from typing import Union
 def get_woe(
     df: Union[pl.DataFrame, pl.LazyFrame], y: str, x: str
 ) -> Union[pl.DataFrame, pl.LazyFrame]:
-
     df_woe = (
         df.group_by(x)
         .agg(

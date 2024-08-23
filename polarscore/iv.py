@@ -26,7 +26,7 @@ def calculate_iv(
     cols_x = cs.expand_selector(df, cs.exclude(y))
 
     ls_iv = [
-        get_woe(df, x, y).select(pl.lit(x).alias("var"), pl.col("iv").sum())
+        get_woe(df, y, x).select(pl.lit(x).alias("var"), pl.col("iv").sum())
         for x in cols_x
     ]
     df_iv = pl.concat(ls_iv)

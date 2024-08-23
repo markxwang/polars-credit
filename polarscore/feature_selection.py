@@ -1,4 +1,5 @@
 import polars as pl
+from .iv import calculate_iv
 from .base import PolarSelectorMixin
 from sklearn.base import BaseEstimator
 
@@ -124,8 +125,26 @@ class IdenticalRatioThreshold(PolarSelectorMixin, BaseEstimator):
         else:
             expr = pl.all().eq_missing(expr_mode)
 
-        X_mode_ratio_above_tr = X.select(expr.mean() > self.threshold)
+        X_mode_ratio_above_tr = X.select(expr.mean() >= self.threshold)
 
         self.cols_to_drop_ = [col.name for col in X_mode_ratio_above_tr if col.item()]
 
+        return self
+
+
+class IVThreshold(PolarSelectorMixin, BaseEstimator):
+    def __init__(self, threshold: float = 0.02):
+        self.threshold = threshold
+
+    def get_cols_to_drop(self):
+        return self.cols_to_drop_
+
+    def fit(self, X: pl.DataFrame, y: pl.Series):
+        Xy = X.with_columns(y)
+
+        self.cols_to_drop_ = (
+            calculate_iv(Xy, y.name)
+            .filter(pl.col("iv") <= self.threshold)["var"]
+            .to_list()
+        )
         return self

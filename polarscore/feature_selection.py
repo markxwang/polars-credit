@@ -62,18 +62,21 @@ class NullRatioThreshold(PolarSelectorMixin, BaseEstimator):
         return self
 
 
-class ModeRatioThreshold(PolarSelectorMixin, BaseEstimator):
+class IdenticalRatioThreshold(PolarSelectorMixin, BaseEstimator):
     """
-    A transformer that removes columns based on th e ratio of the mode value.
+    A feature selector that removes columns with a high ratio of identical values.
 
-    This class implements a feature selection strategy that removes columns
-    where the ratio of the most frequent value (mode) exceeds a specified threshold.
+    This selector computes the ratio of the most frequent value (mode) for each column
+    and removes columns where this ratio exceeds a specified threshold.
 
     Parameters:
     -----------
     threshold : float, optional (default=0.95)
-        The threshold for the mode ratio. Columns with a mode ratio equal to or
+        The threshold for the identical value ratio. Columns with a ratio equal to or
         higher than this value will be removed.
+    ignore_nulls : bool, optional (default=True)
+        If True, null values are ignored when calculating the ratio. If False, null
+        values are included in the ratio calculation.
 
     Attributes:
     -----------
@@ -84,7 +87,7 @@ class ModeRatioThreshold(PolarSelectorMixin, BaseEstimator):
     Methods:
     --------
     fit(X, y=None)
-        Identify the columns to be dropped based on their mode ratio.
+        Identify the columns to be dropped based on their identical value ratio.
     transform(X)
         Remove the identified columns from the input DataFrame.
     get_cols_to_drop()
@@ -93,29 +96,35 @@ class ModeRatioThreshold(PolarSelectorMixin, BaseEstimator):
     Examples:
     ---------
     >>> import polars as pl
-    >>> from polarscore.feature_selection import ModeRatioThreshold
+    >>> from polarscore.feature_selection import IdenticalRatioThreshold
     >>> df = pl.DataFrame({
-    ...     'A': [1, 1, 1, 2, 3],
+    ...     'A': [1, 1, 1, 2, 1],
     ...     'B': [1, 1, 1, 1, 1],
     ...     'C': [1, 2, 3, 4, 5]
     ... })
-    >>> selector = ModeRatioThreshold(threshold=0.8)
+    >>> selector = IdenticalRatioThreshold(threshold=0.8)
     >>> selector.fit(df)
     >>> df_transformed = selector.transform(df)
     >>> print(df_transformed.columns)
     ['A', 'C']
     """
 
-    def __init__(self, threshold: float = 0.95):
+    def __init__(self, threshold: float = 0.95, ignore_nulls: bool = True):
         self.threshold = threshold
+        self.ignore_nulls = ignore_nulls
 
     def get_cols_to_drop(self):
         return self.cols_to_drop_
 
     def fit(self, X: pl.DataFrame, y=None):
-        X_mode_ratio_above_tr = X.select(
-            pl.all().eq(pl.all().mode().first()).mean() > self.threshold
-        )
+        expr_mode = pl.all().drop_nulls().mode().first()
+
+        if self.ignore_nulls:
+            expr = pl.all().eq(expr_mode)
+        else:
+            expr = pl.all().eq_missing(expr_mode)
+
+        X_mode_ratio_above_tr = X.select(expr.mean() > self.threshold)
 
         self.cols_to_drop_ = [col.name for col in X_mode_ratio_above_tr if col.item()]
 

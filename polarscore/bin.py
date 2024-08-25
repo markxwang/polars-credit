@@ -42,7 +42,20 @@ def get_qcut_breaks_expr(col: str, q: int, allow_duplicates: bool = True):
     return expr_rm_inf
 
 
-class QuantileBinner(BaseEstimator, TransformerMixin):
+class BinnerMixin(BaseEstimator, TransformerMixin):
+    def transform(self, X: pl.DataFrame):
+        check_is_fitted(self)
+
+        X_cut = X.with_columns(
+            pl.col(col).cut(self.breakpoints_[col])
+            for col in X.columns
+            if col in self.breakpoints_
+        )
+
+        return X_cut
+
+
+class QuantileBinner(BinnerMixin):
     """
     A transformer that bins numeric columns into quantiles.
 
@@ -97,13 +110,12 @@ class QuantileBinner(BaseEstimator, TransformerMixin):
 
         return self
 
-    def transform(self, X: pl.DataFrame):
-        check_is_fitted(self)
 
-        X_cut = X.with_columns(
-            pl.col(col).cut(self.breakpoints_[col])
-            for col in X.columns
-            if col in self.breakpoints_
-        )
+class CustomBinner(BinnerMixin):
+    def __init__(self, breakpoints: dict):
+        self.breakpoints = breakpoints
 
-        return X_cut
+    def fit(self, X: pl.DataFrame, y=None):
+        # needs to add validation logic later
+        self.breakpoints_ = self.breakpoints
+        return self

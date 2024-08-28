@@ -1,5 +1,5 @@
 import polars as pl
-from .iv import calculate_iv
+from .woe import calculate_iv
 from .base import PolarSelectorMixin
 from sklearn.base import BaseEstimator
 

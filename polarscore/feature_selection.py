@@ -184,11 +184,7 @@ class IVThreshold(PolarSelectorMixin, BaseEstimator):
         return self.cols_to_drop_
 
     def fit(self, X: pl.DataFrame, y: pl.Series):
-        Xy = X.with_columns(y)
+        df_iv_filter = calculate_iv(X, y).filter(pl.col("iv") <= self.threshold)
+        self.cols_to_drop_ = df_iv_filter["var"].to_list()
 
-        self.cols_to_drop_ = (
-            calculate_iv(Xy, y.name)
-            .filter(pl.col("iv") <= self.threshold)["var"]
-            .to_list()
-        )
         return self

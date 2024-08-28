@@ -133,6 +133,50 @@ class IdenticalRatioThreshold(PolarSelectorMixin, BaseEstimator):
 
 
 class IVThreshold(PolarSelectorMixin, BaseEstimator):
+    """
+    A feature selector that removes features based on their Information Value (IV).
+
+    This class implements a feature selection strategy that calculates the Information Value
+    for each feature with respect to a target variable and removes features with IV below
+    a specified threshold.
+
+    Parameters:
+    -----------
+    threshold : float, optional (default=0.02)
+        The threshold for Information Value. Features with IV less than or equal to
+        this threshold will be removed.
+
+    Attributes:
+    -----------
+    cols_to_drop_ : list
+        A list of column names identified for removal during the fit phase.
+
+    Methods:
+    --------
+    fit(X, y)
+        Calculate the Information Value for each feature and identify columns to be dropped.
+    transform(X)
+        Remove the identified columns from the input DataFrame.
+    get_cols_to_drop()
+        Return the list of columns identified for removal.
+
+    Examples:
+    ---------
+    >>> import polars as pl
+    >>> from polarscore.feature_selection import IVThreshold
+    >>> X = pl.DataFrame({
+    ...     'A': [1, 2, 1, 2, 1],
+    ...     'B': [1, 1, 1, 1, 1],
+    ...     'C': [1, 2, 3, 4, 5]
+    ... })
+    >>> y = pl.Series([0, 1, 0, 1, 0])
+    >>> selector = IVThreshold(threshold=0.1)
+    >>> selector.fit(X, y)
+    >>> X_transformed = selector.transform(X)
+    >>> print(X_transformed.columns)
+    ['A', 'C']
+    """
+
     def __init__(self, threshold: float = 0.02):
         self.threshold = threshold
 

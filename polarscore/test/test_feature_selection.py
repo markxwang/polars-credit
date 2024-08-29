@@ -1,10 +1,11 @@
-import pytest
 import polars as pl
+import pytest
+
 from polarscore.feature_selection import NullRatioThreshold
 
 
 @pytest.mark.parametrize(
-    "threshold, expected_columns",
+    ("threshold", "expected_columns"),
     [
         (0.5, ["A", "B", "C"]),
         (0.3, ["B", "C"]),

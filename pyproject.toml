@@ -8,7 +8,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-polars = "^1.5.0"
+polars = "^1.6.0"
 scikit-learn = "^1.5.1"
 
 

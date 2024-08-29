@@ -1,10 +1,11 @@
 import polars as pl
-from polarscore.bin import get_qcut_breaks_expr
 import pytest
+
+from polarscore.bin import get_qcut_breaks_expr
 
 
 @pytest.mark.parametrize(
-    "data, q, allow_duplicates, expected_len",
+    ("data", "q", "allow_duplicates", "expected_len"),
     [
         (range(100), 4, True, 3),
         ([1.0, 2.0, float("inf")], 2, True, 1),

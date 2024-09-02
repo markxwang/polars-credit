@@ -1,26 +1,17 @@
-[tool.poetry]
+[project]
 name = "polarscore"
-version = "0.2.0"
+version = "0.3.0"
 description = "Lightning-fast credit scorecard building with Polars"
-authors = ["mark.wang <wxgter@gmail.com>"]
-license = "BSD-3"
+authors = [{ name = "Mark Wang", email = "wxgter@gmail.com" }]
 readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "altair>=5.4.1",
+    "polars>=1.6.0",
+    "polarscore",
+    "scikit-learn>=1.5.1",
+]
 
-[tool.poetry.dependencies]
-python = "^3.9"
-polars = "^1.6.0"
-scikit-learn = "^1.5.1"
-
-
-[tool.poetry.group.test.dependencies]
-pytest = "^8.3.2"
-pytest-cov = "^5.0.0"
-
-
-[tool.poetry.group.dev.dependencies]
-ipykernel = "^6.29.5"
-ruff = "^0.6.1"
-pre-commit = "^3.8.0"
 
 [tool.ruff]
 line-length = 88
@@ -100,6 +91,18 @@ strict = true
 [tool.ruff.format]
 docstring-code-format = true
 
+[tool.uv]
+dev-dependencies = [
+    "ipykernel>=6.29.5",
+    "pre-commit>=3.8.0",
+    "pytest-cov>=5.0.0",
+    "pytest>=8.3.2",
+    "ruff>=0.6.3",
+]
+
+[tool.uv.sources]
+polarscore = { workspace = true }
+
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"

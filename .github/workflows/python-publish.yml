@@ -21,6 +21,9 @@ on:
         type: boolean
         default: false
 
+defaults:
+  run:
+    shell: bash
 jobs:
   create-sdist:
     runs-on: ubuntu-latest

@@ -1,6 +1,6 @@
 [project]
 name = "polarscore"
-version = "0.3.0"
+version = "0.4.0"
 description = "Lightning-fast credit scorecard building with Polars"
 authors = [{ name = "Mark Wang", email = "wxgter@gmail.com" }]
 readme = "README.md"

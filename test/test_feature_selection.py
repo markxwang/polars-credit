@@ -1,6 +1,5 @@
 import polars as pl
 import pytest
-
 from polarscore.feature_selection import NullRatioThreshold
 
 

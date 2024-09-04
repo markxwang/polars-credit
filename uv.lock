@@ -650,6 +650,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pip"
+version = "24.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/4d/87/fb90046e096a03aeab235e139436b3fe804cdd447ed2093b0d70eba3f7f8/pip-24.2.tar.gz", hash = "sha256:5b5e490b5e9cb275c879595064adce9ebd31b854e3e803740b72f9ccf34a45b8", size = 1922041 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d4/55/90db48d85f7689ec6f81c0db0622d704306c5284850383c090e6c7195a5c/pip-24.2-py3-none-any.whl", hash = "sha256:2cd581cf58ab7fcfca4ce8efa6dcacd0de5bf8d0a3eb9ec927e07405f4d9e2a2", size = 1815170 },
+]
+
+[[package]]
 name = "platformdirs"
 version = "4.2.2"
 source = { registry = "https://pypi.org/simple" }
@@ -682,7 +691,7 @@ wheels = [
 
 [[package]]
 name = "polarscore"
-version = "0.3.0"
+version = "0.4.0"
 source = { editable = "." }
 dependencies = [
     { name = "altair" },
@@ -694,6 +703,7 @@ dependencies = [
 dev = [
     { name = "ipykernel" },
     { name = "maturin" },
+    { name = "pip" },
     { name = "pre-commit" },
     { name = "pytest" },
     { name = "pytest-cov" },
@@ -704,7 +714,7 @@ dev = [
 requires-dist = [
     { name = "altair", specifier = ">=5.4.1" },
     { name = "polars", specifier = ">=1.6.0" },
-    { name = "polarscore", editable = "." },
+    { name = "polarscore" },
     { name = "scikit-learn", specifier = ">=1.5.1" },
 ]
 
@@ -712,6 +722,7 @@ requires-dist = [
 dev = [
     { name = "ipykernel", specifier = ">=6.29.5" },
     { name = "maturin", specifier = ">=1.7.1" },
+    { name = "pip", specifier = ">=24.2" },
     { name = "pre-commit", specifier = ">=3.8.0" },
     { name = "pytest", specifier = ">=8.3.2" },
     { name = "pytest-cov", specifier = ">=5.0.0" },

@@ -1,6 +1,5 @@
 import polars as pl
 import pytest
-
 from polarscore.bin import get_qcut_breaks_expr
 
 

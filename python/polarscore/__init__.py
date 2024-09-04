@@ -4,6 +4,8 @@ import polars as pl
 from polars._typing import IntoExpr
 from polars.plugins import register_plugin_function
 
+from polarscore import base, bin, feature_selection, woe
+
 LIB = Path(__file__).parent
 
 
@@ -18,3 +20,6 @@ def iv(x: IntoExpr, y: IntoExpr) -> pl.Expr:  # noqa: D103
     )
 
     return output
+
+
+__all__ = ["iv", "woe", "feature_selection", "bin", "base"]

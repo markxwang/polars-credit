@@ -1,11 +1,11 @@
 use polars::prelude::*;
 use pyo3_polars::derive::polars_expr;
 
-fn woe_output(_: &[Field]) -> PolarsResult<Field> {
-    let value = Field::new("value", DataType::String);
+fn woe_type(_: &[Field]) -> PolarsResult<Field> {
+    let x: Field = Field::new("x", DataType::String);
     let woe: Field = Field::new("woe", DataType::Float64);
-    let v: Vec<Field> = vec![value, woe];
-    Ok(Field::new("woe_output", DataType::Struct(v)))
+    let v: Vec<Field> = vec![x, woe];
+    Ok(Field::new("woe_type", DataType::Struct(v)))
 }
 
 fn cal_woe(x: &Series, y: &Series) -> PolarsResult<LazyFrame> {
@@ -34,13 +34,13 @@ fn cal_woe(x: &Series, y: &Series) -> PolarsResult<LazyFrame> {
     Ok(out)
 }
 
-#[polars_expr(output_type_func=woe_output)]
-fn pl_woe_discrete(inputs: &[Series]) -> PolarsResult<Series> {
+#[polars_expr(output_type_func=woe_type)]
+fn pl_woe(inputs: &[Series]) -> PolarsResult<Series> {
     let df = cal_woe(&inputs[0], &inputs[1])?
         .select([col("x"), col("woe")])
         .collect()?;
 
-    Ok(df.into_struct("woe_output").into_series())
+    Ok(df.into_struct("woe_type").into_series())
 }
 
 #[polars_expr(output_type=Float64)]

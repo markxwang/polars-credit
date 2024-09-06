@@ -9,7 +9,7 @@ from polarscore import base, bin, feature_selection, woe
 LIB = Path(__file__).parent
 
 
-def iv(x: IntoExpr, y: IntoExpr) -> pl.Expr:  # noqa: D103
+def cal_iv(x: IntoExpr, y: IntoExpr) -> pl.Expr:  # noqa: D103
     output = register_plugin_function(
         args=[x, y],
         plugin_path=LIB,
@@ -22,4 +22,24 @@ def iv(x: IntoExpr, y: IntoExpr) -> pl.Expr:  # noqa: D103
     return output
 
 
-__all__ = ["iv", "woe", "feature_selection", "bin", "base"]
+def cal_woe(x: IntoExpr, y: IntoExpr) -> pl.Expr:  # noqa: D103
+    output = register_plugin_function(
+        args=[x, y],
+        plugin_path=LIB,
+        function_name="pl_woe",
+        is_elementwise=False,
+        changes_length=True,
+        returns_scalar=False,
+    )
+
+    return output
+
+
+__all__ = [
+    "cal_iv",
+    "cal_woe",
+    "woe",
+    "feature_selection",
+    "bin",
+    "base",
+]

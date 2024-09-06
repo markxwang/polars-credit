@@ -680,7 +680,6 @@ dev = [
 requires-dist = [
     { name = "altair", specifier = ">=5.4.1" },
     { name = "polars", specifier = ">=1.6.0" },
-    { name = "polarscore" },
     { name = "scikit-learn", specifier = ">=1.5.1" },
 ]
 

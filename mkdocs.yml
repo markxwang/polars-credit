@@ -41,3 +41,4 @@ nav:
   - Quick Start: index.md
   - API Reference:
       - WOE: api-reference/woe.md
+      - Imputation: api-reference/impute.md

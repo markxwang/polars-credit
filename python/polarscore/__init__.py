@@ -4,7 +4,7 @@ import polars as pl
 from polars._typing import IntoExpr
 from polars.plugins import register_plugin_function
 
-from polarscore import base, bin, feature_selection, woe
+from polarscore import base, bin, feature_selection, impute, woe
 
 LIB = Path(__file__).parent
 
@@ -42,4 +42,5 @@ __all__ = [
     "feature_selection",
     "bin",
     "base",
+    "impute",
 ]

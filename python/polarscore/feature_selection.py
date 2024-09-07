@@ -1,7 +1,6 @@
 import polars as pl
 from sklearn.base import BaseEstimator
 
-import polarscore as ps
 from polarscore.base import PolarSelectorMixin
 from polarscore.woe import calculate_iv
 
@@ -182,7 +181,6 @@ class IVThreshold(PolarSelectorMixin, BaseEstimator):
     >>> X_transformed = selector.transform(X)
     >>> print(X_transformed.columns)
     ['A', 'C']
-
     """
 
     def __init__(self, threshold: float = 0.02):
@@ -194,13 +192,9 @@ class IVThreshold(PolarSelectorMixin, BaseEstimator):
 
     def fit(self, X: pl.DataFrame, y: pl.Series):
         """Fit the IV threshold."""
-        df_iv_filter = (
-            X.with_columns(y)
-            .select(ps.iv(x=pl.exclude(y.name).cast(pl.String), y=pl.col(y.name)))
-            .unpivot(variable_name="var", value_name="iv")
-            .filter(pl.col("iv") <= self.threshold)
-        )
-        df_iv_filter = calculate_iv(X, y).filter(pl.col("iv") <= self.threshold)
+        self.iv_ = X.with_columns(y).pipe(calculate_iv, y.name)
+
+        df_iv_filter = self.iv_.filter(pl.col("iv") <= self.threshold)
         self.cols_to_drop_ = df_iv_filter["var"].to_list()
 
         return self

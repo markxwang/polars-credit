@@ -1,4 +1,4 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 
 import polars as pl
 from sklearn.base import TransformerMixin
@@ -29,31 +29,9 @@ class PolarSelectorMixin(TransformerMixin, metaclass=ABCMeta):
 
     """
 
-    @abstractmethod
     def get_cols_to_drop(self):
-        """
-        Get the list of columns to be dropped.
-
-        This method should be implemented by subclasses to define the specific
-        criteria for selecting columns to be dropped during the feature selection
-        process.
-
-        Returns
-        -------
-        list
-            A list of column names that should be dropped from the DataFrame.
-
-        Raises
-        ------
-        NotImplementedError
-            If the method is not implemented by a subclass.
-
-        Notes
-        -----
-        This is an abstract method that must be overridden by subclasses.
-        The implementation should return a list of column names based on
-        the feature selection criteria defined in the subclass.
-        """
+        """Get the columns to drop."""
+        return self.cols_to_drop_
 
     def transform(self, X: pl.DataFrame) -> pl.DataFrame:
         """

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import polars as pl
 from sklearn.base import BaseEstimator, TransformerMixin
 
@@ -48,52 +50,6 @@ def get_woe(df: pl.DataFrame, y: str, x: str) -> pl.DataFrame:
     )
 
     return df_woe
-
-
-def calculate_iv(X: pl.DataFrame, y: pl.Series):
-    """
-    Calculate the Information Value (IV) for each feature in X with respect to y.
-
-    This function computes the Information Value, a measure of a variable's
-    predictive power in relation to a binary target variable.
-
-    Parameters
-    ----------
-    X : pl.DataFrame
-        The input DataFrame containing the features.
-    y : pl.Series
-        The target variable as a Polars Series. Should be binary (0 or 1).
-
-    Returns
-    -------
-    pl.DataFrame
-        A DataFrame with two columns:
-        - 'var': The name of the variable (feature).
-        - 'iv': The calculated Information Value for that variable.
-
-    Notes
-    -----
-    The Information Value is calculated using the Weight of Evidence (WOE)
-    transformation. It provides a measure of each feature's predictive power,
-    with higher values indicating stronger predictive ability.
-
-    The function uses lazy evaluation for efficiency and can handle large datasets.
-
-    """
-    df = X.with_columns(y).lazy()
-
-    ls_iv = []
-
-    for x in X.columns:
-        iv = df.pipe(get_woe, y=y.name, x=x).select(
-            var=pl.lit(x),
-            iv=(pl.col("woe") * (pl.col("bad") - pl.col("good"))).sum(),
-        )
-
-        ls_iv.append(iv)
-
-    df_iv = pl.concat(ls_iv).collect()
-    return df_iv
 
 
 class WOETransformer(BaseEstimator, TransformerMixin):

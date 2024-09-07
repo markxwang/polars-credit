@@ -1,23 +1,21 @@
 import polars as pl
 from sklearn.base import BaseEstimator
 
-import polarscore as ps
 from polarscore.base import PolarSelectorMixin
-from polarscore.woe import calculate_iv
+from polarscore.util import cal_iv, cal_psi
 
 
 class NullRatioThreshold(PolarSelectorMixin, BaseEstimator):
     """
-    A transformer that removes columns with a high proportion of null values.
+    A feature selector that removes columns with a high ratio of null values.
 
-    This class implements a feature selection strategy based on the ratio of null
-    values in each column. Columns with a null ratio equal to or higher than the
-    specified threshold are removed during the transformation phase.
+    This selector computes the ratio of null values for each column and removes
+    columns where this ratio exceeds a specified threshold.
 
     Parameters
     ----------
     threshold : float, optional (default=0.95)
-        The threshold for the null ratio. Columns with a null ratio equal to or
+        The threshold for the null value ratio. Columns with a ratio equal to or
         higher than this value will be removed.
 
     Attributes
@@ -29,7 +27,7 @@ class NullRatioThreshold(PolarSelectorMixin, BaseEstimator):
     Methods
     -------
     fit(X, y=None)
-        Identify the columns to be dropped based on their null ratio.
+        Identify the columns to be dropped based on their null value ratio.
     transform(X)
         Remove the identified columns from the input DataFrame.
     get_cols_to_drop()
@@ -42,24 +40,25 @@ class NullRatioThreshold(PolarSelectorMixin, BaseEstimator):
     >>> df = pl.DataFrame(
     ...     {
     ...         "A": [1, None, 3, None, 5],
-    ...         "B": [None, None, None, None, 1],
+    ...         "B": [None, None, None, None, None],
     ...         "C": [1, 2, 3, 4, 5],
     ...     }
     ... )
-    >>> selector = NullRatioThreshold(threshold=0.6)
+    >>> selector = NullRatioThreshold(threshold=0.8)
     >>> selector.fit(df)
     >>> df_transformed = selector.transform(df)
     >>> print(df_transformed.columns)
     ['A', 'C']
 
+    Notes
+    -----
+    This selector is particularly useful for removing columns with a high proportion
+    of missing values, which might not be informative or could potentially bias
+    the analysis or model training.
     """
 
     def __init__(self, threshold: float = 0.95):
         self.threshold = threshold
-
-    def get_cols_to_drop(self):
-        """Get the columns to drop."""
-        return self.cols_to_drop_
 
     def fit(self, X: pl.DataFrame, y=None):
         """Fit the null ratio threshold."""
@@ -72,19 +71,20 @@ class NullRatioThreshold(PolarSelectorMixin, BaseEstimator):
 
 class IdenticalRatioThreshold(PolarSelectorMixin, BaseEstimator):
     """
-    A feature selector that removes columns with a high ratio of identical values.
+    A feature selector that removes columns based on the ratio of identical values.
 
-    This selector computes the ratio of the most frequent value (mode) for each column
-    and removes columns where this ratio exceeds a specified threshold.
+    This class implements a feature selection strategy that calculates the ratio of
+    identical values for each column and removes columns where this ratio exceeds
+    a specified threshold.
 
     Parameters
     ----------
     threshold : float, optional (default=0.95)
-        The threshold for the identical value ratio. Columns with a ratio equal to or
-        higher than this value will be removed.
+        The threshold for the ratio of identical values. Columns with a ratio
+        greater than or equal to this threshold will be removed.
     ignore_nulls : bool, optional (default=True)
-        If True, null values are ignored when calculating the ratio. If False, null
-        values are included in the ratio calculation.
+        If True, null values are ignored when calculating the ratio of identical values.
+        If False, null values are treated as a distinct value.
 
     Attributes
     ----------
@@ -95,7 +95,7 @@ class IdenticalRatioThreshold(PolarSelectorMixin, BaseEstimator):
     Methods
     -------
     fit(X, y=None)
-        Identify the columns to be dropped based on their identical value ratio.
+        Identify the columns to be dropped based on their ratio of identical values.
     transform(X)
         Remove the identified columns from the input DataFrame.
     get_cols_to_drop()
@@ -106,7 +106,7 @@ class IdenticalRatioThreshold(PolarSelectorMixin, BaseEstimator):
     >>> import polars as pl
     >>> from polarscore.feature_selection import IdenticalRatioThreshold
     >>> df = pl.DataFrame(
-    ...     {"A": [1, 1, 1, 2, 1], "B": [1, 1, 1, 1, 1], "C": [1, 2, 3, 4, 5]}
+    ...     {"A": [1, 1, 1, 1, 2], "B": [1, 1, 1, 1, 1], "C": [1, 2, 3, 4, 5]}
     ... )
     >>> selector = IdenticalRatioThreshold(threshold=0.8)
     >>> selector.fit(df)
@@ -114,15 +114,16 @@ class IdenticalRatioThreshold(PolarSelectorMixin, BaseEstimator):
     >>> print(df_transformed.columns)
     ['A', 'C']
 
+    Notes
+    -----
+    This selector is particularly useful for removing columns with a high proportion
+    of identical values, which might not provide much information or could potentially
+    introduce bias in the analysis or model training.
     """
 
     def __init__(self, threshold: float = 0.95, *, ignore_nulls: bool = True):
         self.threshold = threshold
         self.ignore_nulls = ignore_nulls
-
-    def get_cols_to_drop(self):
-        """Get the columns to drop."""
-        return self.cols_to_drop_
 
     def fit(self, X: pl.DataFrame, y=None):
         """Fit the identical ratio threshold."""
@@ -182,25 +183,78 @@ class IVThreshold(PolarSelectorMixin, BaseEstimator):
     >>> X_transformed = selector.transform(X)
     >>> print(X_transformed.columns)
     ['A', 'C']
-
     """
 
     def __init__(self, threshold: float = 0.02):
         self.threshold = threshold
 
-    def get_cols_to_drop(self):
-        """Get the columns to drop."""
-        return self.cols_to_drop_
-
     def fit(self, X: pl.DataFrame, y: pl.Series):
         """Fit the IV threshold."""
-        df_iv_filter = (
-            X.with_columns(y)
-            .select(ps.iv(x=pl.exclude(y.name).cast(pl.String), y=pl.col(y.name)))
-            .unpivot(variable_name="var", value_name="iv")
-            .filter(pl.col("iv") <= self.threshold)
-        )
-        df_iv_filter = calculate_iv(X, y).filter(pl.col("iv") <= self.threshold)
+        self.iv_ = X.with_columns(y).pipe(cal_iv, y.name)
+
+        df_iv_filter = self.iv_.filter(pl.col("iv") <= self.threshold)
         self.cols_to_drop_ = df_iv_filter["var"].to_list()
 
+        return self
+
+
+class PSIThreshold(PolarSelectorMixin, BaseEstimator):
+    """
+    Population Stability Index (PSI) Threshold Selector.
+
+    This class implements a feature selector that removes features based on their
+    Population Stability Index (PSI) values. Features with PSI values less than or
+    equal to a specified threshold are removed.
+
+    Parameters
+    ----------
+    threshold : float, optional (default=0.1)
+        The threshold for Population Stability Index. Features with PSI less than or
+        equal to this threshold will be removed.
+
+    Attributes
+    ----------
+    cols_to_drop_ : list
+        A list of column names identified for removal during the fit phase.
+    psi_ : pl.DataFrame
+        A DataFrame containing the PSI values for each feature.
+
+    Methods
+    -------
+    fit(X, y, t)
+        Calculate the Population Stability Index for each feature and identify columns
+        to be dropped.
+    transform(X)
+        Remove the identified columns from the input DataFrame.
+    get_cols_to_drop()
+        Return the list of columns identified for removal.
+
+    Examples
+    --------
+    >>> import polars as pl
+    >>> from polarscore.feature_selection import PSIThreshold
+    >>> X = pl.DataFrame(
+    ...     {"A": [1, 2, 1, 2, 1], "B": [1, 1, 1, 1, 1], "C": [1, 2, 3, 4, 5]}
+    ... )
+    >>> t = pl.Series([1, 1, 2, 2, 2])  # Time periods
+    >>> selector = PSIThreshold(threshold=0.05)
+    >>> selector.fit(X, t=t)
+    >>> X_transformed = selector.transform(X)
+    >>> print(X_transformed.columns)
+    ['A', 'C']
+    """
+
+    def __init__(self, threshold: float = 0.1):
+        self.threshold = threshold
+
+    def fit(self, X: pl.DataFrame, y: pl.Series = None, t: pl.Series = None):
+        """Fit the PSI threshold."""
+        if t is None:
+            msg = "t must be provided"
+            raise ValueError(msg)
+
+        self.psi_ = X.with_columns(t).pipe(cal_psi, t.name)
+
+        df_psi_filter = self.psi_.filter(pl.col("psi") <= self.threshold)
+        self.cols_to_drop_ = df_psi_filter["var"].to_list()
         return self

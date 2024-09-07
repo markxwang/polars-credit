@@ -3,8 +3,6 @@ from __future__ import annotations
 import polars as pl
 from sklearn.base import BaseEstimator, TransformerMixin
 
-from polarscore.util import _jeffrey_divergence
-
 
 def get_woe(df: pl.DataFrame, y: str, x: str) -> pl.DataFrame:
     """
@@ -52,55 +50,6 @@ def get_woe(df: pl.DataFrame, y: str, x: str) -> pl.DataFrame:
     )
 
     return df_woe
-
-
-def calculate_iv(df: pl.DataFrame | pl.LazyFrame, y: str):
-    """
-    Calculate the Information Value (IV) for all features in a DataFrame with respect
-    to a binary target variable.
-
-    This function computes the Information Value for each feature in the DataFrame,
-    which measures the predictive power of the feature with respect to the target
-    variable.
-
-    Parameters
-    ----------
-    df : pl.DataFrame | pl.LazyFrame
-        The input DataFrame or LazyFrame containing both the features and target
-        variable.
-    y : str
-        The name of the binary target variable column (0 or 1).
-
-    Returns
-    -------
-    pl.DataFrame
-        A DataFrame with the following columns:
-        - 'column': The name of each feature
-        - 'iv': The calculated Information Value for each feature
-
-    Notes
-    -----
-    Information Value is calculated as the sum of (% of non-events - % of events) * WOE
-    for each category of a feature, where WOE is the Weight of Evidence.
-
-    This function uses lazy evaluation for efficiency and can handle large datasets.
-    It calculates IV for all columns in the DataFrame except the target variable.
-
-    Raises
-    ------
-    ValueError
-        If the target variable is not found in the DataFrame columns.
-    """  # noqa: D205
-    df_lazy = df.lazy()
-    cols = df_lazy.collect_schema().names()
-
-    if y not in cols:
-        msg = f"Target variable '{y}' not found in the DataFrame columns."
-        raise ValueError(msg)
-    ls_iv = [_jeffrey_divergence(df_lazy, x=x, y=y) for x in cols if x != y]
-    df_iv = pl.concat(ls_iv).collect().rename({"val": "iv"})
-
-    return df_iv
 
 
 class WOETransformer(BaseEstimator, TransformerMixin):

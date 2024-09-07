@@ -71,3 +71,108 @@ def _jeffrey_divergence(
     )
 
     return df_divergence
+
+
+def _multi_jeffrey_divergence(df: pl.DataFrame | pl.LazyFrame, y: str):
+    """
+    Calculate Jeffrey divergence for multiple variables against a target variable.
+
+    This function computes the Jeffrey divergence for each variable in the DataFrame
+    (except the target variable) against the specified target variable.
+
+    Parameters
+    ----------
+    df : pl.DataFrame | pl.LazyFrame
+        The input DataFrame or LazyFrame containing the variables to analyze.
+    y : str
+        The name of the target variable column.
+
+    Returns
+    -------
+    pl.DataFrame
+        A DataFrame containing the Jeffrey divergence for each variable.
+        The result has two columns:
+        - 'var': The name of the variable.
+        - 'val': The calculated Jeffrey divergence value.
+
+    Notes
+    -----
+    This function uses the _jeffrey_divergence function to calculate the divergence
+    for each variable. It excludes the target variable from the calculation.
+    The result is collected into a single DataFrame.
+    """
+    df_lazy = df.lazy()
+    cols = df_lazy.collect_schema().names()
+
+    ls_iv = [_jeffrey_divergence(df_lazy, x=x, y=y) for x in cols if x != y]
+
+    df_iv = pl.concat(ls_iv).collect()
+
+    return df_iv
+
+
+def cal_iv(df: pl.DataFrame | pl.LazyFrame, y: str):
+    """
+    Calculate Information Value (IV) for multiple variables against a target variable.
+
+    This function computes the Information Value for each variable in the DataFrame
+    (except the target variable) against the specified target variable. The IV is
+    calculated using Jeffrey divergence.
+
+    Parameters
+    ----------
+    df : pl.DataFrame | pl.LazyFrame
+        The input DataFrame or LazyFrame containing the variables to analyze.
+    y : str
+        The name of the target variable column.
+
+    Returns
+    -------
+    pl.DataFrame
+        A DataFrame containing the Information Value for each variable.
+        The result has two columns:
+        - 'var': The name of the variable.
+        - 'iv': The calculated Information Value.
+
+    Notes
+    -----
+    This function uses the _multi_jeffrey_divergence function to calculate the
+    divergence for each variable. The resulting values are interpreted as Information
+    Values.
+    """
+    df_iv = _multi_jeffrey_divergence(df, y).rename({"val": "iv"})
+    return df_iv
+
+
+def cal_psi(df: pl.DataFrame | pl.LazyFrame, t: str):
+    """
+    Calculate Population Stability Index for multiple variables against a time var.
+
+    This function computes the Population Stability Index for each variable in the
+    DataFrame (except the time variable) against the specified time variable. The PSI is
+    calculated using Jeffrey divergence.
+
+    Parameters
+    ----------
+    df : pl.DataFrame | pl.LazyFrame
+        The input DataFrame or LazyFrame containing the variables to analyze.
+    t : str
+        The name of the time variable column.
+
+    Returns
+    -------
+    pl.DataFrame
+        A DataFrame containing the Population Stability Index for each variable.
+        The result has two columns:
+        - 'var': The name of the variable.
+        - 'psi': The calculated Population Stability Index.
+
+    Notes
+    -----
+    This function uses the _multi_jeffrey_divergence function to calculate the
+    divergence for each variable. The resulting values are interpreted as Population
+    Stability Indices.
+    PSI is used to measure the stability of a variable's distribution over time.
+    """
+    df_iv = _multi_jeffrey_divergence(df, t).rename({"val": "psi"})
+    return df_iv

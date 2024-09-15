@@ -2,7 +2,7 @@ import polars as pl
 from sklearn.base import BaseEstimator
 
 from polars_credit.base import PolarSelectorMixin
-from polars_credit.util import cal_iv, cal_psi
+from polars_credit.util.divergence import cal_iv, cal_psi
 
 
 class NullRatioThreshold(PolarSelectorMixin, BaseEstimator):

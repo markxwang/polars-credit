@@ -1,1 +1,1 @@
-:::polarscore.woe
+:::polars_credit.woe

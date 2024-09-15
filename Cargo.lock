@@ -1431,7 +1431,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "polarscore"
+name = "polars_credit"
 version = "0.5.0"
 dependencies = [
  "polars",

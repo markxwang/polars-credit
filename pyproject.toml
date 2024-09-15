@@ -1,5 +1,5 @@
 [project]
-name = "polarscore"
+name = "polars-credit"
 version = "0.5.0"
 description = "Lightning-fast credit scorecard building with Polars"
 authors = [{ name = "Mark Wang", email = "wxgter@gmail.com" }]
@@ -100,6 +100,6 @@ requires = ["maturin>=1.0,<2.0"]
 build-backend = "maturin"
 
 [tool.maturin]
-module-name = "polarscore._internal"
+module-name = "polars_credit._internal"
 python-source = "python"
 features = ["pyo3/extension-module"]

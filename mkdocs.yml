@@ -1,5 +1,5 @@
-site_name: polarscore
-repo_name: markxwang/polarscore
+site_name: polars-credit
+repo_name: markxwang/polars-credit
 
 theme:
   name: "material"

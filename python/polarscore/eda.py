@@ -1,6 +1,5 @@
 import polars as pl
-
-from polarscore import cal_iv
+from polars_credit import cal_iv
 
 
 def _eda_long_format(df, operation, *args, **kwargs):

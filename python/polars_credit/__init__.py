@@ -3,6 +3,7 @@ from pathlib import Path
 import polars as pl
 from polars._typing import IntoExpr
 from polars.plugins import register_plugin_function
+
 from polars_credit import base, bin, feature_selection, impute, util, woe
 
 LIB = Path(__file__).parent

@@ -1,7 +1,8 @@
 import polars as pl
+from sklearn.base import BaseEstimator
+
 from polars_credit.base import PolarSelectorMixin
 from polars_credit.util import cal_iv, cal_psi
-from sklearn.base import BaseEstimator
 
 
 class NullRatioThreshold(PolarSelectorMixin, BaseEstimator):

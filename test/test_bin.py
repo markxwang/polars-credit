@@ -1,6 +1,6 @@
 import polars as pl
 import pytest
-from polarscore.bin import get_qcut_breaks_expr
+from polars_credit.bin import get_qcut_breaks_expr
 
 
 @pytest.mark.parametrize(

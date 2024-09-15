@@ -44,7 +44,7 @@ def get_qcut_breaks_expr(col: str, q: int, *, allow_duplicates: bool = True):
 
 class BinnerMixin(BaseEstimator, TransformerMixin):
     """
-    Base class for binning transformers in Polarscore.
+    Base class for binning transformers in polars_credit.
 
     This abstract base class defines the interface for binning transformers
     that work with Polars DataFrames. It extends scikit-learn's BaseEstimator
@@ -142,7 +142,7 @@ class QuantileBinner(BinnerMixin):
     Examples
     --------
     >>> import polars as pl
-    >>> from polarscore.bin import QuantileBinner
+    >>> from polars_credit.bin import QuantileBinner
     >>> df = pl.DataFrame({"A": [1, 2, 3, 4, 5], "B": [10, 20, 30, 40, 50]})
     >>> binner = QuantileBinner(q=3)
     >>> binner.fit(df)
@@ -213,7 +213,7 @@ class CustomBinner(BinnerMixin):
     Examples
     --------
     >>> import polars as pl
-    >>> from polarscore.bin import CustomBinner
+    >>> from polars_credit.bin import CustomBinner
     >>> df = pl.DataFrame({"A": [1, 2, 3, 4, 5], "B": [10, 20, 30, 40, 50]})
     >>> breakpoints = {"A": [0, 2, 4, 6], "B": [0, 25, 50, 75]}
     >>> binner = CustomBinner(breakpoints)

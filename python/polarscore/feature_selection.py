@@ -1,8 +1,7 @@
 import polars as pl
+from polars_credit.base import PolarSelectorMixin
+from polars_credit.util import cal_iv, cal_psi
 from sklearn.base import BaseEstimator
-
-from polarscore.base import PolarSelectorMixin
-from polarscore.util import cal_iv, cal_psi
 
 
 class NullRatioThreshold(PolarSelectorMixin, BaseEstimator):
@@ -36,7 +35,7 @@ class NullRatioThreshold(PolarSelectorMixin, BaseEstimator):
     Examples
     --------
     >>> import polars as pl
-    >>> from polarscore.feature_selection import NullRatioThreshold
+    >>> from polars_credit.feature_selection import NullRatioThreshold
     >>> df = pl.DataFrame(
     ...     {
     ...         "A": [1, None, 3, None, 5],
@@ -104,7 +103,7 @@ class IdenticalRatioThreshold(PolarSelectorMixin, BaseEstimator):
     Examples
     --------
     >>> import polars as pl
-    >>> from polarscore.feature_selection import IdenticalRatioThreshold
+    >>> from polars_credit.feature_selection import IdenticalRatioThreshold
     >>> df = pl.DataFrame(
     ...     {"A": [1, 1, 1, 1, 2], "B": [1, 1, 1, 1, 1], "C": [1, 2, 3, 4, 5]}
     ... )
@@ -173,7 +172,7 @@ class IVThreshold(PolarSelectorMixin, BaseEstimator):
     Examples
     --------
     >>> import polars as pl
-    >>> from polarscore.feature_selection import IVThreshold
+    >>> from polars_credit.feature_selection import IVThreshold
     >>> X = pl.DataFrame(
     ...     {"A": [1, 2, 1, 2, 1], "B": [1, 1, 1, 1, 1], "C": [1, 2, 3, 4, 5]}
     ... )
@@ -232,7 +231,7 @@ class PSIThreshold(PolarSelectorMixin, BaseEstimator):
     Examples
     --------
     >>> import polars as pl
-    >>> from polarscore.feature_selection import PSIThreshold
+    >>> from polars_credit.feature_selection import PSIThreshold
     >>> X = pl.DataFrame(
     ...     {"A": [1, 2, 1, 2, 1], "B": [1, 1, 1, 1, 1], "C": [1, 2, 3, 4, 5]}
     ... )

@@ -1,10 +1,10 @@
-# Polarscore
+# Polars-Credit
 
-![PyPI - Downloads](https://img.shields.io/pypi/dm/polarscore)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/polars_credit)
 
 ## Overview
 
-Polarscore is a Python library designed for lightning-fast credit scorecard building.
+Polars-credit is a Python library designed for lightning-fast credit scorecard building.
 
 ## Features
 

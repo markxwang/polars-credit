@@ -1,10 +1,10 @@
 [package]
-name = "polarscore"
+name = "polars_credit"
 version = "0.5.0"
 edition = "2021"
 
 [lib]
-name = "polarscore"
+name = "polars_credit"
 crate-type = ["cdylib"]
 
 [dependencies]

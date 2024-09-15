@@ -77,7 +77,7 @@ class WOETransformer(BaseEstimator, TransformerMixin):
     Examples
     --------
     >>> import polars as pl
-    >>> from polarscore.woe import WOETransformer
+    >>> from polars_credit.woe import WOETransformer
     >>> X = pl.DataFrame({"A": ["a", "b", "a", "c"], "B": [1, 2, 1, 3]})
     >>> y = pl.Series([0, 1, 0, 1])
     >>> woe = WOETransformer()

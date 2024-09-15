@@ -6,7 +6,7 @@ from sklearn.base import TransformerMixin
 
 class PolarSelectorMixin(TransformerMixin, metaclass=ABCMeta):
     """
-    Base class for feature selectors in Polarscore.
+    Base class for feature selectors in polars_credit.
 
     This abstract base class defines the interface for feature selectors
     that work with Polars DataFrames. It extends scikit-learn's TransformerMixin

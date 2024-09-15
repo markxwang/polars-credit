@@ -1,6 +1,6 @@
 import polars as pl
 import pytest
-from polarscore.feature_selection import NullRatioThreshold
+from polars_credit.feature_selection import NullRatioThreshold
 
 
 @pytest.mark.parametrize(

@@ -31,7 +31,7 @@ class FixedValueImputer(TransformerMixin, BaseEstimator):
     Examples
     --------
     >>> import polars as pl
-    >>> from polarscore.impute import FixedValueImputer
+    >>> from polars_credit.impute import FixedValueImputer
     >>> df = pl.DataFrame({"A": [1, None, 3], "B": ["x", None, "z"]})
     >>> imputer = FixedValueImputer({"A": 0, "B": "unknown"})
     >>> imputer.fit_transform(df)

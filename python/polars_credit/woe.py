@@ -41,8 +41,8 @@ def get_woe(df: pl.DataFrame, y: str, x: str) -> pl.DataFrame:
     df_woe = (
         df.group_by(x)
         .agg(
-            pl.col(y).eq(0).sum().alias("good"),
-            pl.col(y).eq(1).sum().alias("bad"),
+            (1 - pl.col(y)).sum().alias("good"),
+            pl.col(y).sum().alias("bad"),
         )
         .with_columns(pl.col("good", "bad") / pl.col("good", "bad").sum())
         .with_columns((pl.col("bad") / pl.col("good")).log().alias("woe"))

@@ -3,6 +3,8 @@ import polars.selectors as cs
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
+from polars_credit.util.expr import _parse_expr
+
 
 def get_qcut_breaks_expr(col: str, q: int, *, allow_duplicates: bool = True):
     """
@@ -29,15 +31,13 @@ def get_qcut_breaks_expr(col: str, q: int, *, allow_duplicates: bool = True):
 
     """
     expr = (
-        pl.col(col)
+        _parse_expr(col)
         .qcut(q, include_breaks=True, allow_duplicates=allow_duplicates)
         .struct.field("breakpoint")
         .unique()
     )
 
-    expr_rm_inf = (
-        pl.when(~expr.is_infinite()).then(expr).drop_nulls().implode().alias(col)
-    )
+    expr_rm_inf = expr.filter(~expr.is_infinite()).implode().alias(col)
 
     return expr_rm_inf
 

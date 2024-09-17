@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import polars as pl
 
 
@@ -25,5 +27,21 @@ def cal_miv(df: pl.DataFrame, y: str, y_pred: str, x: str) -> pl.DataFrame:
             * (pl.col("bad_actual") - pl.col("good_actual"))
         )
     )
+
+    return df_miv
+
+
+def cal_multiple_miv(
+    df: pl.DataFrame | pl.LazyFrame, y: str, y_pred: str
+) -> pl.DataFrame:
+    """Calculate MIV for multiple variables."""
+    df_lazy = df.lazy()
+    cols = df_lazy.collect_schema().names()
+
+    ls_miv = [
+        cal_miv(df_lazy, y=y, y_pred=y_pred, x=x) for x in cols if x not in (y, y_pred)
+    ]
+
+    df_miv = pl.concat(ls_miv).collect()
 
     return df_miv

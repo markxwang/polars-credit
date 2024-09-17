@@ -53,6 +53,7 @@ class ScorecardTransformer(BaseEstimator, ClassifierMixin):
         self.base_odds = base_odds
 
     def fit(self, X, y):
+        """Fit the model according to the given training data."""
         self.factor_ = self.pdo / log(self.rate)
         self.offset_ = self.base_score - self.factor_ * log(self.base_odds)
 
@@ -61,6 +62,7 @@ class ScorecardTransformer(BaseEstimator, ClassifierMixin):
         return self
 
     def predict_proba(self, X):
+        """Predict class probabilities for X."""
         check_is_fitted(self)
         log_proba = self.cls_fitted_.predict_log_proba(X)
         scores = self.offset_ + self.factor_ * (log_proba[:, 1] - log_proba[:, 0])
@@ -68,6 +70,7 @@ class ScorecardTransformer(BaseEstimator, ClassifierMixin):
         return scores
 
     def predict(self, X):
+        """Predict class labels for X."""
         check_is_fitted(self)
 
         return self.cls_fitted_.predict(X)

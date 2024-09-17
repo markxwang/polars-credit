@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import polars as pl
+from polars_credit.util.polars import _get_cols
 
 
 def _jeffrey_divergence(
@@ -102,7 +103,7 @@ def _multi_jeffrey_divergence(df: pl.DataFrame | pl.LazyFrame, y: str):
     The result is collected into a single DataFrame.
     """
     df_lazy = df.lazy()
-    cols = df_lazy.collect_schema().names()
+    cols = _get_cols(df_lazy)
 
     ls_iv = [_jeffrey_divergence(df_lazy, x=x, y=y) for x in cols if x != y]
 

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import polars as pl
 
+from polars_credit.util.polars import _get_cols
+
 
 def cal_miv(df: pl.DataFrame, y: str, y_pred: str, x: str) -> pl.DataFrame:
     """Calculate MIV."""
@@ -36,7 +38,7 @@ def cal_multiple_miv(
 ) -> pl.DataFrame:
     """Calculate MIV for multiple variables."""
     df_lazy = df.lazy()
-    cols = df_lazy.collect_schema().names()
+    cols = _get_cols(df_lazy)
 
     ls_miv = [
         cal_miv(df_lazy, y=y, y_pred=y_pred, x=x) for x in cols if x not in (y, y_pred)
